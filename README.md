@@ -43,13 +43,23 @@ Esa URL es la única que necesitan todas las librerías.
 
 ### Al publicar cambios
 
-Si modificas `index.html`, `styles.css` o `app.js`, sube la versión en `sw.js`:
+`index.html`, `styles.css`, `app.js` y `manifest.json` se piden **a la red primero**:
+cada vez que alguien abre la app con internet, recibe la última versión publicada.
+No hay que hacer nada más.
+
+Solo si cambias algo dentro de `vendor/` o `icons/` hay que subir la versión en `sw.js`,
+porque esos archivos se sirven desde el caché:
 
 ```js
-const VERSION = 'buscador-v2';   // v1 → v2
+const VERSION = 'buscador-v3';   // v2 → v3
 ```
 
-Sin eso, los teléfonos seguirán mostrando la versión vieja guardada en caché.
+Conviene subir también `VERSION_APP` en `app.js`, que es lo que la gente ve
+en Catálogo → Versión e instalación.
+
+Quien tenga la app abierta cuando publiques verá una barra abajo con el aviso
+y un botón para actualizar. También hay un botón **Buscar actualización** en
+la sección Catálogo.
 
 ---
 
@@ -82,6 +92,9 @@ La única columna obligatoria es el título. Las demás se activan si están:
 | Precio | Muestra «Sin precio» |
 | ISBN | Se ocultan el escáner y el filtro por ISBN |
 | Categoría, Existencias | No se muestran |
+
+Cualquier campo puede quedar en **No mostrar**, aunque el CSV sí tenga esa columna:
+sirve para ocultar datos que no quieres enseñar al público (existencias, por ejemplo).
 
 Formatos de precio reconocidos: `77.623`, `$77.623`, `77623`, `15.000,00`, `45,000.50`.
 
@@ -117,6 +130,25 @@ El script se encarga de lo que cada sistema exige: rellena en blanco las zonas
 recortadas, genera una versión opaca y sin esquinas para iOS —que recorta el
 icono por su cuenta— y otra con el dibujo reducido al 48 % para el recorte
 circular de algunos lanzadores de Android.
+
+---
+
+## Listas
+
+Toca el corazón de cualquier resultado para guardarlo. Puedes tener varias listas
+a la vez (pedidos, apartados, novedades) y un mismo libro en más de una. Cada lista
+muestra el total sumado y se puede copiar como texto para pegarla en WhatsApp o
+en un correo.
+
+**Las listas viven aparte del catálogo.** Se guardan en su propia bodega del
+teléfono, así que sobreviven a cargar un CSV nuevo y a borrar el catálogo. Cada
+libro guardado conserva una copia de sus datos: si desaparece del inventario, la
+lista lo sigue mostrando con el precio que tenía, marcado como «No está en el
+catálogo actual». Si el título vuelve a aparecer en un CSV posterior, se reconecta
+solo y vuelve a mostrar el precio vigente.
+
+El enlace entre lista y catálogo se hace por ISBN; si el libro no tiene, se usa la
+combinación de título y editorial.
 
 ---
 

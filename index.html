@@ -31,6 +31,10 @@
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
     <span>Buscar</span>
   </button>
+  <button class="nav__tab" data-seccion="listas">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-9.2A4 4 0 0 1 12 8a4 4 0 0 1 7 2.8C19 15.6 12 20 12 20z"/></svg>
+    <span>Listas</span>
+  </button>
   <button class="nav__tab" data-seccion="editoriales">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h6.5v14H4z"/><path d="M13.5 5.5H20v14h-6.5z"/></svg>
     <span>Editoriales</span>
@@ -85,6 +89,37 @@
 
   </section>
 
+  <!-- ══════════ LISTAS ══════════ -->
+  <section class="seccion" id="seccion-listas">
+
+    <div id="vistaListas">
+      <div class="bloque__acciones bloque__acciones--sueltas">
+        <button class="boton boton--primario" id="botonNuevaLista">Crear lista</button>
+      </div>
+      <p class="resultados__meta" id="metaListas"></p>
+      <div id="listaDeListas"></div>
+      <div class="vacio" id="vacioListas" hidden>
+        <p class="vacio__titulo">Todavía no tienes listas</p>
+        <p class="vacio__texto">Toca el corazón en cualquier resultado para empezar una colección: pedidos, novedades, lo que quieras apartar.</p>
+      </div>
+    </div>
+
+    <div id="vistaListaAbierta" hidden>
+      <div class="lista-cabecera">
+        <button class="volver" id="volverListas" aria-label="Volver a las listas">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2 class="lista-cabecera__nombre" id="nombreListaAbierta"></h2>
+        <button class="icono-accion" id="menuLista" aria-label="Opciones de la lista">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none"/></svg>
+        </button>
+      </div>
+      <p class="resultados__meta" id="metaListaAbierta"></p>
+      <div id="librosDeLista"></div>
+    </div>
+
+  </section>
+
   <!-- ══════════ EDITORIALES ══════════ -->
   <section class="seccion" id="seccion-editoriales">
     <div class="barra barra--sola">
@@ -107,7 +142,7 @@
 
     <div class="bloque">
       <h2 class="bloque__titulo">Cargar catálogo</h2>
-      <p class="bloque__ayuda">Elige el archivo CSV del inventario. Queda guardado en este teléfono y reemplaza el anterior.</p>
+      <p class="bloque__ayuda">Elige el archivo CSV del inventario. Queda guardado en este teléfono y reemplaza el anterior. Tus listas no se tocan.</p>
       <label class="boton boton--primario" for="entradaArchivo">Elegir archivo CSV</label>
       <input type="file" id="entradaArchivo" accept=".csv,.txt,text/csv" hidden>
       <p class="aviso" id="avisoArchivo" hidden></p>
@@ -115,7 +150,7 @@
 
     <div class="bloque" id="bloqueMapeo" hidden>
       <h2 class="bloque__titulo">Revisar columnas</h2>
-      <p class="bloque__ayuda">Esto se hace una sola vez por librería. Si el archivo siempre tiene el mismo formato, las próximas cargas se resuelven solas.</p>
+      <p class="bloque__ayuda">Cada dato de la app se conecta con una columna del archivo. Deja <strong>No mostrar</strong> en lo que no quieras enseñar o no exista en el CSV. Esto se hace una vez por librería: si el archivo siempre tiene el mismo formato, las próximas cargas se resuelven solas.</p>
       <div id="camposMapeo"></div>
       <div class="previsualizacion" id="previsualizacion"></div>
       <div class="bloque__acciones">
@@ -137,13 +172,18 @@
     </div>
 
     <div class="bloque">
-      <h2 class="bloque__titulo">Instalar en la pantalla de inicio</h2>
+      <h2 class="bloque__titulo">Versión e instalación</h2>
+      <p class="bloque__ayuda" id="ayudaVersion"></p>
       <p class="bloque__ayuda" id="ayudaInstalar"></p>
-      <button class="boton" id="botonInstalar" hidden>Instalar aplicación</button>
+      <div class="bloque__acciones">
+        <button class="boton" id="botonBuscarActualizacion">Buscar actualización</button>
+        <button class="boton" id="botonInstalar" hidden>Instalar aplicación</button>
+      </div>
     </div>
 
     <div class="bloque">
       <button class="boton boton--peligro" id="botonBorrar">Borrar catálogo de este teléfono</button>
+      <p class="bloque__ayuda bloque__ayuda--pie">Las listas guardadas se conservan.</p>
     </div>
 
   </section>
@@ -153,6 +193,33 @@
 <footer class="pie">
   Aplicación web desarrollada por Diego Agudelo — godeloz@gmail.com
 </footer>
+
+<!-- ══════════ FICHA DEL LIBRO ══════════ -->
+<div class="hoja" id="hojaFicha" hidden>
+  <div class="hoja__fondo" data-cerrar="hojaFicha"></div>
+  <div class="hoja__panel" role="dialog" aria-modal="true" aria-labelledby="fichaTitulo">
+    <div class="hoja__asa" data-cerrar="hojaFicha"></div>
+    <div class="hoja__cuerpo" id="fichaCuerpo"></div>
+  </div>
+</div>
+
+<!-- ══════════ SELECTOR DE LISTAS ══════════ -->
+<div class="hoja" id="hojaListas" hidden>
+  <div class="hoja__fondo" data-cerrar="hojaListas"></div>
+  <div class="hoja__panel" role="dialog" aria-modal="true" aria-labelledby="listasTitulo">
+    <div class="hoja__asa" data-cerrar="hojaListas"></div>
+    <div class="hoja__cuerpo">
+      <h2 class="hoja__titulo" id="listasTitulo">Guardar en…</h2>
+      <p class="hoja__sub" id="listasSub"></p>
+      <div id="opcionesListas"></div>
+      <div class="nueva-lista">
+        <input type="text" class="entrada-texto" id="entradaNuevaLista" placeholder="Nombre de la lista nueva" maxlength="40">
+        <button class="boton boton--primario" id="botonCrearYGuardar">Crear</button>
+      </div>
+      <button class="boton boton--ancho" data-cerrar="hojaListas">Listo</button>
+    </div>
+  </div>
+</div>
 
 <!-- ══════════ ESCÁNER ══════════ -->
 <div class="escaner" id="escaner" hidden>
@@ -165,6 +232,11 @@
     <div class="escaner__marco" aria-hidden="true"></div>
   </div>
   <p class="escaner__pie" id="escanerPie">Busca el ISBN en el catálogo guardado.</p>
+</div>
+
+<div class="barra-version" id="barraActualizacion" hidden>
+  <span>Hay una versión nueva de la app</span>
+  <button id="botonActualizar">Actualizar</button>
 </div>
 
 <div class="aviso-flotante" id="avisoFlotante" role="status" aria-live="polite" hidden></div>

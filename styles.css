@@ -206,13 +206,38 @@ main{ max-width: 820px; margin: 0 auto; padding: 0 20px; }
 .libro{
   display: grid;
   grid-template-columns: 4px 1fr auto;
-  align-items: center;
-  gap: 0 14px;
+  align-items: stretch;
   border-bottom: 1px solid var(--separador);
 }
 .libro:last-child{ border-bottom: 0; }
-.libro__franja{ align-self: stretch; background: var(--franja, var(--tinta-3)); }
+.libro__franja{ background: var(--franja, var(--tinta-3)); }
+.libro__cuerpo{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0 12px;
+  padding: 0 0 0 14px;
+  background: none; border: 0; text-align: left; cursor: pointer;
+  min-width: 0; width: 100%;
+  font: inherit; color: inherit;
+}
+.libro__cuerpo:active{ background: var(--fondo); }
+.libro__corazon{
+  align-self: center;
+  width: 46px; height: 46px; margin-right: 4px;
+  display: grid; place-items: center;
+  background: none; border: 0; cursor: pointer;
+  color: var(--tinta-3);
+}
+.libro__corazon svg{ width: 21px; height: 21px; }
+.libro__corazon.is-guardado{ color: var(--acento); }
+.libro__corazon.is-guardado svg{ fill: currentColor; }
+/* Dentro de <button> solo cabe contenido en línea, así que las filas de la
+   tarjeta son <span> y hay que volverlas bloque a mano. */
 .libro__datos{ padding: 13px 0 13px 0; min-width: 0; }
+.libro__datos > span,
+.libro__titulo, .libro__autor, .libro__editorial,
+.libro__extra, .libro__ausente, .libro__precio{ display: block; }
 .libro__titulo{
   margin: 0;
   font-size: 16px; font-weight: 600; letter-spacing: -.01em;
@@ -232,7 +257,7 @@ main{ max-width: 820px; margin: 0 auto; padding: 0 20px; }
   font-variant-numeric: tabular-nums;
 }
 .libro__precio{
-  padding: 13px 16px 13px 0;
+  padding: 13px 0;
   text-align: right; white-space: nowrap;
   font-size: 20px; font-weight: 650; letter-spacing: -.02em;
   font-variant-numeric: tabular-nums;
@@ -454,6 +479,178 @@ mark{ background: #FFE9A8; color: inherit; border-radius: 3px; padding: 0 1px; }
   .cabecera{ padding-top: 30px; }
   .cabecera__nombre{ font-size: 32px; }
   .aviso-flotante{ bottom: 28px; }
+}
+
+/* ─────────── Listas ─────────── */
+
+.bloque__acciones--sueltas{ margin: 14px 0; }
+.bloque__ayuda--pie{ margin: 12px 0 0; font-size: 13px; }
+
+.lista-guardada{
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center; gap: 0 10px;
+  width: 100%;
+  padding: 0 14px 0 16px;
+  background: none; border: 0;
+  border-bottom: 1px solid var(--separador);
+  text-align: left; cursor: pointer;
+  font: inherit; color: inherit;
+}
+.lista-guardada:last-child{ border-bottom: 0; }
+.lista-guardada:active{ background: var(--fondo); }
+.lista-guardada__nombre{
+  padding: 16px 0;
+  font-size: 16.5px; font-weight: 600; letter-spacing: -.01em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.lista-guardada__conteo{
+  font-size: 13px; color: var(--tinta-3); font-variant-numeric: tabular-nums;
+}
+.lista-guardada__flecha{ width: 18px; height: 18px; color: var(--tinta-3); }
+
+.lista-cabecera{
+  display: grid; grid-template-columns: auto 1fr auto;
+  align-items: center; gap: 6px;
+  padding: 8px 0 12px;
+}
+.lista-cabecera__nombre{
+  margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -.02em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.volver, .icono-accion{
+  width: 38px; height: 38px;
+  display: grid; place-items: center;
+  background: none; border: 0; cursor: pointer; color: var(--acento);
+}
+.volver{ margin-left: -9px; }
+.icono-accion{ color: var(--tinta-2); margin-right: -9px; }
+
+.libro--ausente .libro__titulo{ color: var(--tinta-2); }
+.libro__ausente{
+  margin: 5px 0 0;
+  font-size: 12px; color: var(--tinta-3); font-style: italic;
+}
+
+/* ─────────── Hojas deslizantes ─────────── */
+
+.hoja{ position: fixed; inset: 0; z-index: 70; display: flex; align-items: flex-end; }
+.hoja[hidden]{ display: none; }
+.hoja--encima{ z-index: 75; }
+.hoja__fondo{ position: absolute; inset: 0; background: rgba(0,0,0,.34); }
+.hoja__panel{
+  position: relative; z-index: 1;
+  width: 100%; max-height: 88vh; overflow-y: auto;
+  background: var(--superficie);
+  border-radius: 20px 20px 0 0;
+  padding-bottom: calc(18px + var(--seguro-inf));
+  animation: subir .22s cubic-bezier(.32,.72,0,1);
+}
+@keyframes subir{ from{ transform: translateY(100%); } to{ transform: none; } }
+.hoja__asa{
+  height: 22px; display: grid; place-items: center; cursor: pointer;
+}
+.hoja__asa::before{
+  content: ''; width: 38px; height: 5px; border-radius: 3px;
+  background: var(--separador); margin-top: 8px;
+}
+.hoja__cuerpo{ padding: 6px 20px 0; }
+.hoja__titulo{ margin: 6px 0 2px; font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
+.hoja__sub{ margin: 0 0 16px; font-size: 14px; color: var(--tinta-2); }
+
+/* Ficha del libro */
+.ficha__editorial{
+  display: inline-flex; align-items: center; gap: 7px;
+  margin: 4px 0 0;
+  font-size: 13.5px; font-weight: 600; color: var(--franja, var(--tinta-2));
+}
+.ficha__editorial::before{
+  content: ''; width: 4px; height: 15px; border-radius: 2px;
+  background: var(--franja, var(--tinta-3));
+}
+.ficha__titulo{
+  margin: 14px 0 3px;
+  font-size: 24px; font-weight: 700; letter-spacing: -.024em; line-height: 1.2;
+}
+.ficha__autor{ margin: 0; font-size: 16px; color: var(--tinta-2); }
+.ficha__precio{
+  margin: 20px 0 0;
+  font-size: 40px; font-weight: 700; letter-spacing: -.035em;
+  font-variant-numeric: tabular-nums; line-height: 1;
+}
+.ficha__precio--vacio{ font-size: 19px; font-weight: 600; color: var(--tinta-3); }
+.ficha__datos{
+  margin: 20px 0 0; padding: 4px 0 0;
+  border-top: 1px solid var(--separador);
+}
+.ficha__datos div{
+  display: flex; justify-content: space-between; gap: 16px;
+  padding: 9px 0; border-bottom: 1px solid var(--separador);
+  font-size: 14.5px;
+}
+.ficha__datos div:last-child{ border-bottom: 0; }
+.ficha__datos dt{ color: var(--tinta-2); }
+.ficha__datos dd{ margin: 0; font-weight: 500; text-align: right; font-variant-numeric: tabular-nums; }
+.ficha__acciones{ display: flex; gap: 10px; margin: 20px 0 0; }
+.ficha__acciones .boton{ flex: 1; }
+
+/* Selector de listas */
+.opcion-lista{
+  display: grid; grid-template-columns: 24px 1fr auto;
+  align-items: center; gap: 0 12px;
+  width: 100%; padding: 13px 0;
+  background: none; border: 0; border-bottom: 1px solid var(--separador);
+  text-align: left; cursor: pointer; font: inherit; color: inherit;
+}
+.opcion-lista__marca{
+  width: 23px; height: 23px; border-radius: 50%;
+  border: 1.8px solid var(--separador);
+  display: grid; place-items: center; color: transparent;
+}
+.opcion-lista.is-dentro .opcion-lista__marca{
+  background: var(--acento); border-color: var(--acento); color: #fff;
+}
+.opcion-lista__marca svg{ width: 14px; height: 14px; stroke-width: 2.6; }
+.opcion-lista__nombre{ font-size: 16px; font-weight: 500; }
+.opcion-lista__conteo{ font-size: 13px; color: var(--tinta-3); font-variant-numeric: tabular-nums; }
+
+.nueva-lista{ display: flex; gap: 10px; margin: 16px 0 14px; }
+.nueva-lista .entrada-texto{ flex: 1; }
+.boton--ancho{ width: 100%; }
+.hoja__cuerpo .boton--ancho + .boton--ancho{ margin-top: 10px; }
+.hoja__cuerpo .boton--ancho:last-child{ margin-bottom: 4px; }
+
+/* ─────────── Barra de actualización ─────────── */
+
+.barra-version{
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(80px + var(--seguro-inf));
+  z-index: 85;
+  display: flex; align-items: center; gap: 14px;
+  max-width: calc(100vw - 32px);
+  background: var(--tinta); color: #fff;
+  padding: 11px 12px 11px 18px;
+  border-radius: 999px;
+  font-size: 14px; font-weight: 500;
+}
+.barra-version[hidden]{ display: none; }
+.barra-version button{
+  border: 0; border-radius: 999px; cursor: pointer;
+  background: var(--acento); color: #fff;
+  padding: 8px 15px; font-size: 14px; font-weight: 600;
+}
+
+@media (min-width: 768px){
+  .barra-version{ bottom: 28px; }
+  .hoja{ align-items: center; justify-content: center; }
+  .hoja__panel{
+    max-width: 520px; border-radius: 18px;
+    padding-bottom: 20px;
+    animation: aparecer .18s ease-out;
+  }
+  @keyframes aparecer{ from{ opacity: 0; transform: scale(.97); } to{ opacity: 1; transform: none; } }
+  .hoja__asa{ display: none; }
+  .hoja__cuerpo{ padding: 22px 24px 0; }
 }
 
 @media (prefers-reduced-motion: reduce){
