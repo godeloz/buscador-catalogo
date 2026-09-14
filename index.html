@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Buscador de catálogo</title>
+<meta name="description" content="Buscador de catálogo de librería. Funciona sin conexión.">
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#F2F2F7">
+
+<!-- iOS no lee el icono del manifest: necesita esta etiqueta aparte -->
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Catálogo">
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="cabecera">
+  <div class="cabecera__fila">
+    <h1 class="cabecera__nombre" id="nombreLibreria">Buscador de catálogo</h1>
+    <span class="cabecera__conteo" id="conteoCatalogo"></span>
+  </div>
+</header>
+
+<nav class="nav" aria-label="Secciones">
+  <button class="nav__tab is-activa" data-seccion="buscar" aria-current="page">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+    <span>Buscar</span>
+  </button>
+  <button class="nav__tab" data-seccion="editoriales">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h6.5v14H4z"/><path d="M13.5 5.5H20v14h-6.5z"/></svg>
+    <span>Editoriales</span>
+  </button>
+  <button class="nav__tab" data-seccion="catalogo">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11"/><path d="M8 11l4 4 4-4"/><path d="M4 19h16"/></svg>
+    <span>Catálogo</span>
+  </button>
+</nav>
+
+<main>
+
+  <!-- ══════════ BUSCAR ══════════ -->
+  <section class="seccion is-activa" id="seccion-buscar">
+
+    <div class="barra">
+      <div class="barra__campo">
+        <svg class="barra__lupa" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+        <input type="search" id="entradaBusqueda" placeholder="Título, autor, editorial…"
+               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+               aria-label="Buscar en el catálogo" enterkeyhint="search">
+        <button class="barra__limpiar" id="botonLimpiar" aria-label="Borrar búsqueda" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="currentColor" stroke="none"/><line x1="9" y1="9" x2="15" y2="15" stroke="#fff"/><line x1="15" y1="9" x2="9" y2="15" stroke="#fff"/></svg>
+        </button>
+      </div>
+      <button class="barra__escanear" id="botonEscanear" aria-label="Escanear código de barras">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8"/><path d="M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8"/><path d="M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16"/><path d="M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16"/><line x1="8" y1="8.5" x2="8" y2="15.5"/><line x1="11" y1="8.5" x2="11" y2="15.5"/><line x1="14" y1="8.5" x2="14" y2="15.5"/><line x1="16.5" y1="8.5" x2="16.5" y2="15.5"/></svg>
+      </button>
+    </div>
+
+    <div class="chips" id="chipsCampo" role="group" aria-label="Buscar en">
+      <button class="chip is-activo" data-campo="todo">Todo</button>
+      <button class="chip" data-campo="titulo">Título</button>
+      <button class="chip" data-campo="autor">Autor</button>
+      <button class="chip" data-campo="editorial">Editorial</button>
+      <button class="chip" data-campo="isbn">ISBN</button>
+    </div>
+
+    <div class="filtro-activo" id="filtroActivo" hidden>
+      <span id="filtroActivoTexto"></span>
+      <button id="filtroActivoQuitar" aria-label="Quitar filtro">✕</button>
+    </div>
+
+    <p class="resultados__meta" id="metaResultados" aria-live="polite"></p>
+    <div id="listaResultados"></div>
+    <button class="mas" id="botonMas" hidden>Mostrar más resultados</button>
+
+    <div class="vacio" id="vacioBuscar" hidden>
+      <p class="vacio__titulo" id="vacioTitulo">Aún no hay catálogo</p>
+      <p class="vacio__texto" id="vacioTexto">Ve a <strong>Catálogo</strong> y carga el archivo CSV de tu inventario. Después podrás buscar sin conexión.</p>
+    </div>
+
+  </section>
+
+  <!-- ══════════ EDITORIALES ══════════ -->
+  <section class="seccion" id="seccion-editoriales">
+    <div class="barra barra--sola">
+      <div class="barra__campo">
+        <svg class="barra__lupa" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+        <input type="search" id="entradaEditoriales" placeholder="Filtrar editoriales…"
+               autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Filtrar editoriales">
+      </div>
+    </div>
+    <p class="resultados__meta" id="metaEditoriales"></p>
+    <div id="listaEditoriales"></div>
+  </section>
+
+  <!-- ══════════ CATÁLOGO ══════════ -->
+  <section class="seccion" id="seccion-catalogo">
+
+    <div class="tarjeta-estado" id="tarjetaEstado">
+      <p class="tarjeta-estado__vacio">Sin catálogo cargado</p>
+    </div>
+
+    <div class="bloque">
+      <h2 class="bloque__titulo">Cargar catálogo</h2>
+      <p class="bloque__ayuda">Elige el archivo CSV del inventario. Queda guardado en este teléfono y reemplaza el anterior.</p>
+      <label class="boton boton--primario" for="entradaArchivo">Elegir archivo CSV</label>
+      <input type="file" id="entradaArchivo" accept=".csv,.txt,text/csv" hidden>
+      <p class="aviso" id="avisoArchivo" hidden></p>
+    </div>
+
+    <div class="bloque" id="bloqueMapeo" hidden>
+      <h2 class="bloque__titulo">Revisar columnas</h2>
+      <p class="bloque__ayuda">Esto se hace una sola vez por librería. Si el archivo siempre tiene el mismo formato, las próximas cargas se resuelven solas.</p>
+      <div id="camposMapeo"></div>
+      <div class="previsualizacion" id="previsualizacion"></div>
+      <div class="bloque__acciones">
+        <button class="boton boton--primario" id="botonConfirmar">Guardar catálogo</button>
+        <button class="boton" id="botonCancelar">Cancelar</button>
+      </div>
+    </div>
+
+    <div class="bloque">
+      <h2 class="bloque__titulo">Nombre de la librería</h2>
+      <p class="bloque__ayuda">Aparece arriba, en la cabecera.</p>
+      <input type="text" class="entrada-texto" id="entradaNombre" placeholder="Buscador de catálogo" maxlength="40">
+    </div>
+
+    <div class="bloque">
+      <h2 class="bloque__titulo">Color</h2>
+      <p class="bloque__ayuda">Cambia el color de los botones y acciones.</p>
+      <div class="paleta" id="paleta" role="group" aria-label="Color de acento"></div>
+    </div>
+
+    <div class="bloque">
+      <h2 class="bloque__titulo">Instalar en la pantalla de inicio</h2>
+      <p class="bloque__ayuda" id="ayudaInstalar"></p>
+      <button class="boton" id="botonInstalar" hidden>Instalar aplicación</button>
+    </div>
+
+    <div class="bloque">
+      <button class="boton boton--peligro" id="botonBorrar">Borrar catálogo de este teléfono</button>
+    </div>
+
+  </section>
+
+</main>
+
+<footer class="pie">
+  Aplicación web desarrollada por Diego Agudelo — godeloz@gmail.com
+</footer>
+
+<!-- ══════════ ESCÁNER ══════════ -->
+<div class="escaner" id="escaner" hidden>
+  <div class="escaner__cabecera">
+    <span id="escanerEstado">Apunta al código de barras</span>
+    <button class="escaner__cerrar" id="escanerCerrar" aria-label="Cerrar escáner">✕</button>
+  </div>
+  <div class="escaner__video">
+    <video id="escanerVideo" playsinline muted></video>
+    <div class="escaner__marco" aria-hidden="true"></div>
+  </div>
+  <p class="escaner__pie" id="escanerPie">Busca el ISBN en el catálogo guardado.</p>
+</div>
+
+<div class="aviso-flotante" id="avisoFlotante" role="status" aria-live="polite" hidden></div>
+
+<script src="vendor/papaparse.min.js"></script>
+<script src="vendor/zxing.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
